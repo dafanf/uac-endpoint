@@ -1,15 +1,21 @@
 package com.tujuhsembilan.example.configuration;
 
-import java.io.FileInputStream;
+import java.io.BufferedReader;
+// import java.io.File;
+// import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,7 +36,7 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.util.ResourceUtils;
+// import org.springframework.util.ResourceUtils;
 
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -49,7 +55,8 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApplicationConfig {
-
+  @Autowired
+  private ResourceLoader resourceLoader;
   private final MessageUtil msg;
 
   @Bean
@@ -105,9 +112,14 @@ public class ApplicationConfig {
 
   @Bean
   public ECKey ecJwk() throws IOException, ParseException {
-    try (var in = new FileInputStream(ResourceUtils.getFile("classpath:key/ES512.json"))) {
-      return ECKey.parse(new String(in.readAllBytes(), StandardCharsets.UTF_8));
-    }
+    Resource resource = resourceLoader.getResource("classpath:key/ES512.json");
+
+    try (InputStreamReader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
+            BufferedReader bufferedReader = new BufferedReader(reader)) {
+
+          String jsonContent = bufferedReader.lines().collect(Collectors.joining("\n"));
+          return ECKey.parse(jsonContent);
+      }
   }
 
   @Bean

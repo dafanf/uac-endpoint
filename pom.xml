@@ -10,8 +10,8 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.tujuhsembilan</groupId>
-	<artifactId>example-auth-jwt-custom</artifactId>
-	<version>0.0.0-E</version>
+	<artifactId>kelompok-a6</artifactId>
+	<version>0.0.0-A</version>
 	<name>Spring Boot Example</name>
 	<description>Example Application to Shows Some Feature or Techniques</description>
 	<properties>
